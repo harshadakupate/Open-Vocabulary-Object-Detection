@@ -1,0 +1,19 @@
+{
+  "description": "Test categories for open-vocabulary detection. Edit freely or add categories in the UI.",
+  "categories": [
+    "person", "safety helmet", "safety vest", "fire extinguisher", "mobile phone",
+    "laptop", "traffic cone", "toolbox", "welding machine", "industrial safety equipment",
+    "Vending Machine", "Ambulance", "Telescope", "Stretcher", "Suitcase"
+  ],
+  "common": [
+    "person", "safety helmet", "safety vest", "fire extinguisher", "mobile phone",
+    "laptop", "traffic cone", "toolbox", "welding machine", "industrial safety equipment"
+  ],
+  "uncommon": ["Vending Machine", "Ambulance", "Telescope", "Stretcher", "Suitcase"],
+  "image_conditions": [
+    "single objects", "multiple objects", "small objects", "large objects",
+    "partially occluded objects", "different distances", "different lighting conditions",
+    "cluttered industrial environments"
+  ],
+  "note": "'Uncommon' means rare in typical datasets. It is NOT a claim that these categories were unseen during pretraining."
+}

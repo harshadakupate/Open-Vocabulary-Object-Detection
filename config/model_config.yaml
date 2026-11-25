@@ -1,0 +1,9 @@
+models:
+  grounding_dino:
+    display_name: "Grounding DINO"
+    checkpoint: "IDEA-Research/grounding-dino-tiny"
+    cache_dir: weights/grounding_dino   # Hugging Face download cache
+  yolo_world:
+    display_name: "YOLO-World"
+    checkpoint: "yolov8s-worldv2.pt"
+    weights_dir: weights/yolo_world

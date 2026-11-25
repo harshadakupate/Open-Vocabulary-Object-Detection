@@ -1,0 +1,14 @@
+{
+  "_comment": "FORMAT TEMPLATE ONLY - not real ground truth. Copy to annotations.json and replace with your own labelled data. bbox = [x, y, width, height] in pixels.",
+  "images": [
+    {"id": 1, "file_name": "example_image.jpg", "width": 1280, "height": 720}
+  ],
+  "categories": [
+    {"id": 1, "name": "person"},
+    {"id": 2, "name": "safety helmet"}
+  ],
+  "annotations": [
+    {"id": 1, "image_id": 1, "category_id": 1, "bbox": [100, 80, 200, 370], "iscrowd": 0},
+    {"id": 2, "image_id": 1, "category_id": 2, "bbox": [140, 80, 110, 90], "iscrowd": 0}
+  ]
+}

@@ -1,0 +1,41 @@
+# Central application configuration. The UI can override most values at runtime.
+app:
+  name: "Open-Vocabulary Object Detection"
+
+device:
+  default: auto            # auto | cuda | cpu  (auto = CUDA if available, else CPU)
+
+detection:
+  yolo_conf: 0.25          # YOLO-World confidence threshold
+  dino_box_threshold: 0.35 # Grounding DINO box threshold
+  dino_text_threshold: 0.25 # Grounding DINO text threshold
+
+image:
+  inference_max_side: 1280 # resize long side before inference (0 = keep original size)
+  yolo_imgsz: 640          # Ultralytics inference size
+  allowed_extensions: [".jpg", ".jpeg", ".png", ".bmp", ".webp", ".tif", ".tiff"]
+
+video:
+  frame_skip: 1            # 1 = process every frame, N = process every Nth frame
+  resize_long_side: 0      # 0 = keep original resolution
+  warmup: true             # one untimed warm-up inference before the timed loop
+  max_frames: 0            # 0 = process the full video
+  codecs: ["avc1", "mp4v"] # tried in order when creating the output video
+  allowed_extensions: [".mp4", ".avi", ".mov", ".mkv", ".webm"]
+
+paths:
+  images_in: dataset/images
+  videos_in: dataset/videos
+  annotations_dir: dataset/annotations
+  prompts_dir: dataset/prompts
+  images_out: outputs/images
+  videos_out: outputs/videos
+  reports_out: outputs/reports
+
+benchmark:
+  warmup_runs: 3                  # untimed warm-up inferences before measuring
+  iou_threshold: 0.50             # primary matching threshold
+  map_conf_threshold: 0.05        # low threshold used so AP sees the full ranking
+  monitor_interval_s: 0.2         # background sampling period for RAM / CPU / GPU util
+  images_dir: dataset/images
+  annotations: dataset/annotations/annotations.json
