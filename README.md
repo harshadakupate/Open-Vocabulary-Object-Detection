@@ -11,30 +11,6 @@ What you can do in the dashboard:
 - **Download a report** (PDF or HTML) for every test
 - Run a **benchmark** (precision, recall, speed) if you have a labelled dataset
 
-## Project folder structure
-
-```text
-open_vocabulary_detection/
-  app.py                         Streamlit dashboard
-  run_app.bat                    Windows launcher using the project environment
-  config/                        App and model configuration
-  models/                        Grounding DINO, YOLO-World, and model manager
-  detection/                     Image/video pipelines, prompt manager, visualization
-  benchmarking/                  Evaluation, metrics, monitoring, and reports
-  dataset/
-    images/                      Evaluation images
-    videos/                      Video inputs
-    annotations/                 COCO annotations and format example
-    prompts/                     Built-in and saved prompt sets
-  outputs/                       Generated images, videos, and reports
-  weights/                       Downloaded model weights and caches
-  utils/                         Configuration, device, image, and video helpers
-  tests/                         Unit and model tests
-  requirements.txt               Python dependencies
-  README.md                      Project guide
-  LICENSE
-```
-
 ---
 
 ## 1. The two models
@@ -126,20 +102,6 @@ Then open **http://localhost:8501** in your browser.
 The green **"CUDA ready"** label at the top confirms that the GPU is being used.
 The app **stops with an error** if no GPU is found. This is on purpose, because the GPU is required.
 
-## What is a prompt, and how is it used?
-
-A **prompt** is the object name or category you ask the detector to find, such as `safety helmet` or `stretcher`.
-It tells the model what to look for; it does not train the model or provide the correct answers for evaluation.
-
-- Enter one or more object names in the image, video, or model-comparison workflow. The app removes blank entries
-  and duplicates.
-- Built-in test sets are stored in `dataset/prompts/test_prompts.json`; the prompt manager also supports saving
-  custom sets in `dataset/prompts/saved_prompts.json`.
-- Grounding DINO receives the names as a lower-case, period-separated text string. YOLO-World receives them as a
-  list of class names.
-- Dataset benchmarks use the categories in the COCO annotation file as prompts. The annotations provide the
-  ground-truth boxes needed to calculate precision, recall, and mAP.
-
 Command line (optional):
 
 ```powershell
@@ -149,14 +111,77 @@ python -m detection.video_detection --video clip.mp4 --model "YOLO-World" --prom
 
 ---
 
-## 6. The 15 test categories
+## 6. Sample results
+
+These are real outputs from the dashboard (Grounding DINO, annotated image view). Each picture shows the boxes,
+the object name and the confidence percentage. The title bar at the top of each image shows the number of detections
+and the inference time of that run (between about 690 ms and 1050 ms per image in these examples).
+
+Remember: the percentage is the **model's confidence, not accuracy**. The notes below are only visual observations,
+not benchmark results.
+
+### 6.1 Workshop with welders
+Result: 14 detections, 709.8 ms
+
+![Workshop with welders](docs/images/01_workshop_welding.png)
+
+Workers, helmets and a safety vest are found. Helmet confidence is lower in this crowded scene (about 36-53%), and
+several boxes overlap, so some labels are hard to read.
+
+### 6.2 Worker with phone and laptop
+Result: 5 detections, 932.7 ms
+
+![Worker with phone and laptop](docs/images/02_worker_phone_laptop.png)
+
+A clear, single-person scene: helmet 94%, mobile phone 92%, safety vest 90%, person 86%, laptop 53%.
+
+### 6.3 Airport with vending machine and suitcases
+Result: 11 detections, 753.8 ms
+
+![Airport with vending machine and suitcases](docs/images/03_airport_vending_suitcase.png)
+
+People, suitcases and the large vending machine on the right are found. The two self-service kiosks in the middle also
+appear to be labelled "Vending Machine" (51% and 55%), which looks like a false positive.
+
+### 6.4 Ambulance and stretcher
+Result: 7 detections, 1051.9 ms
+
+![Ambulance and stretcher](docs/images/04_ambulance_stretcher.png)
+
+The ambulance (49%) and the stretcher (38%) are found, together with the medical staff. This was the slowest example.
+
+### 6.5 Toolbox
+Result: 2 detections, 692.9 ms
+
+![Toolbox and person](docs/images/05_toolbox_person.png)
+
+The open tool case is found as "Toolbox" (75%) and the mechanic as "Person" (89%).
+
+### 6.6 Telescope
+Result: 4 detections, 875.9 ms
+
+![Telescope and people](docs/images/06_telescope.png)
+
+The telescope on the left and three people are boxed.
+
+### 6.7 Road works with traffic cones
+Result: 15 detections, 709.4 ms
+
+![Road works with traffic cones](docs/images/07_road_works_cones.png)
+
+Traffic cones (about 52-53%), people, a safety vest and a helmet are found. The row of distant cones produces many
+small overlapping boxes, and one label is cut off at the top edge of the image.
+
+---
+
+## 7. The 15 test categories
 
 Person, Safety Helmet, Safety Vest, Fire Extinguisher, Mobile Phone, Laptop, Traffic Cone, Toolbox, Welding Machine,
 Industrial Safety Equipment, Vending Machine, Ambulance, Telescope, Stretcher, Suitcase
 
 ---
 
-## 7. Measuring accuracy (needs a labelled dataset in COCO format)
+## 8. Measuring accuracy (needs a labelled dataset in COCO format)
 
 Precision, recall and mAP can only be measured if every test image has correct boxes drawn by a person (called
 *ground truth*). The app never shows accuracy numbers without it. Helper tools are included:
@@ -179,9 +204,9 @@ Results (tables and charts) are saved in `outputs/reports/`.
 
 ---
 
-## 8. Challenges we faced
+## 9. Challenges we faced
 
-### 8.1 Creating the benchmark dataset (COCO format)
+### 9.1 Creating the benchmark dataset (COCO format)
 - No ready dataset exists for these 15 categories, so we must **collect images and draw every box by hand**.
 - COCO is strict: boxes are `[x, y, width, height]`, category names must match the prompts exactly. One small mistake
   (box outside the image, missing image file, renamed category) silently spoils the results.
@@ -192,7 +217,7 @@ Results (tables and charts) are saved in `outputs/reports/`.
 - Few images per category means noisy numbers. Aim for about 30 or more images per category.
 - *How we help:* the three `tools/` scripts create, convert and validate the COCO file.
 
-### 8.2 Setting up the computer
+### 9.2 Setting up the computer
 - **Two Pythons installed (3.11 and 3.14):** Streamlit started from the wrong one and failed with `No module named 'cv2'`.
   Fix: always use the project `.venv` made with `py -3.11`.
 - **GPU not used:** the normal Windows PyTorch from PyPI is CPU-only. Fix: `requirements.txt` installs the CUDA build.
@@ -200,16 +225,18 @@ Results (tables and charts) are saved in `outputs/reports/`.
   Fix: exact versions are pinned in `requirements.txt`.
 - **PowerShell:** multi-line `python -c` commands fail. Use `python check_env.py` instead.
 
-### 8.3 Grounding DINO
+### 9.3 Grounding DINO
 - **Slower and heavier** than YOLO-World, even on a GPU, so it is less suited to video.
 - **Labels can come back partial or merged**, for example two neighbouring prompts joined in one label.
   The project maps each label back to the closest prompt.
 - **Results depend on wording.** `welding machine` and `arc welder` can give different results.
 - **Two thresholds** (box and text) must be tuned, and they do not mean the same as YOLO-World's confidence.
 - **Library changes:** the threshold argument was renamed between Transformers versions. The code checks which name exists.
+- **Crowded scenes give overlapping boxes** and some unreadable labels (see samples 6.1 and 6.7).
+- **Look-alike objects can be confused**: in sample 6.3 the airport kiosks also appear to be labelled "Vending Machine".
 - Large first download (about 0.7 GB).
 
-### 8.4 YOLO-World
+### 9.4 YOLO-World
 - **Names must be loaded with `set_classes()`** every time the prompt list changes. The app does this and checks it worked.
 - **Needs the CLIP package and Git.** Ultralytics tries to install it automatically, which needs Git and a restart.
   Fix: CLIP is installed from `requirements.txt`.
@@ -217,20 +244,20 @@ Results (tables and charts) are saved in `outputs/reports/`.
 - **Unusual or ambiguous names are easier to miss**, and it can only return names from the list you give.
 - Detection quality depends on the confidence setting: too high misses objects, too low adds false ones.
 
-### 8.5 Comparing the two fairly
+### 9.5 Comparing the two fairly
 - The first run is slower (model start-up), so one warm-up run is done and not timed.
 - Each model is benchmarked in a **separate process** so memory numbers are not mixed.
 - **Confidence is not accuracy.** A model can be sure and wrong. Only ground truth measures accuracy.
 - Testing on one image is only an example. Use the dataset benchmark for real conclusions.
 - Reported GPU memory is what PyTorch allocated, not everything the driver reserved.
 
-### 8.6 Video
+### 9.6 Video
 - Browsers cannot play the default OpenCV video format. Install **ffmpeg** to convert it automatically, or download the file.
 - Skipping frames makes processing faster but can miss objects.
 
 ---
 
-## 9. Quick fixes
+## 10. Quick fixes
 
 | Problem | What to do |
 |---|---|
@@ -244,7 +271,7 @@ Results (tables and charts) are saved in `outputs/reports/`.
 
 ---
 
-## 10. Reference links
+## 11. Reference links
 
 - Grounding DINO paper: https://arxiv.org/abs/2303.05499
 - Grounding DINO model page: https://huggingface.co/IDEA-Research/grounding-dino-tiny
